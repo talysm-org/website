@@ -1,0 +1,14 @@
+Talysm — Protection you can read
+
+Talysm is an AI first company out of Switzerland, where its founder team have track of record in the Cybersecurity, SaaS and Open Source industry for more than 25 years. 
+
+The philosophy behind: Talysm - coming from Talisman - shifted into a Paradigm. Giving any user or organization a new set of tools, which is Redefining Zero-Trust Security & Architecture with AI Integration.
+
+Products & Services
+Guardian-grade security, engineered for the age of AI and post-quantum cryptography, Talysm unifies 3 Core Services in the Zero-Trust Security & Architecture into one, available as a CE Community Version and Commercial Enterprise Solution for self-hosting or as a SaaS Service from Swiss Datacenter.
+
+Cross Platform
+The Solution will work on all Platforms, including FreeBSD. 
+
+Release Plan & Roadmap
+Until the first public release of a first stable Version on our Github repository, we do not announce more details. A first stable release is expected within Q2/2026.
