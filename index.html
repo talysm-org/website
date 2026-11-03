@@ -329,6 +329,7 @@ document.getElementById('su-form').addEventListener('submit', async function(ev)
   }
   if (!name || name.length > 100) return say("Please enter your name.", false);
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return say("Please enter a valid email.", false);
+  if (SU_PAT === "PH1PH2") return say("Registration opens shortly — please try again soon.", false);
   btn.disabled = true;
   say("Sending…", true);
   try {
