@@ -83,6 +83,9 @@ async function poll(nonce, attempts){
   if (!t || t.length > 80){
     return show("Link incomplete", "This confirmation link is not valid.");
   }
+  if (SU_PAT === "PH1PH2"){
+    return show("Almost there", "Confirmation is temporarily unavailable. Please try again shortly.");
+  }
   const nonce = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   try {
     const p = await suEncrypt({t: t});
