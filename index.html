@@ -79,10 +79,45 @@
   }
   .bigquote em{font-style:normal; color:#fff; border-bottom:1px solid #444; padding-bottom:2px}
 
+  /* ---- launch signup ---- */
+  .signup{padding-bottom:clamp(30px,5vh,52px)}
+  .signup .kicker{margin-bottom:18px}
+  .signup form{max-width:780px}
+  .fields{display:flex; gap:22px; flex-wrap:wrap; align-items:flex-end}
+  .fields>span{flex:1 1 210px; display:flex; flex-direction:column; gap:9px}
+  .fields label{font-size:10px; letter-spacing:.32em; text-transform:uppercase; color:var(--dim)}
+  .fields input[type="text"], .fields input[type="email"]{
+    background:transparent; border:0; border-bottom:1px solid var(--line);
+    color:var(--ink); font:inherit; font-size:15px; padding:9px 2px;
+    border-radius:0; transition:border-color .25s ease;
+  }
+  .fields input:focus{outline:none; border-bottom-color:var(--ink)}
+  .fields input::placeholder{color:#54544f; letter-spacing:.14em; text-transform:uppercase; font-size:11px}
+  .fields button{
+    background:transparent; border:1px solid var(--line); color:var(--ink);
+    font:inherit; font-size:10px; letter-spacing:.32em; text-transform:uppercase;
+    padding:14px 30px; cursor:pointer;
+    transition:border-color .25s ease, transform .25s ease;
+  }
+  .fields button:hover:not(:disabled){border-color:var(--ink); transform:translateY(-2px)}
+  .fields button:disabled{opacity:.45; cursor:default}
+  .hp{position:absolute; left:-9999px; width:1px; height:1px; opacity:0}
+  .disc{
+    margin-top:20px; max-width:62ch;
+    font-size:10px; letter-spacing:.22em; text-transform:uppercase;
+    line-height:2; color:var(--dim);
+  }
+  .su-status{margin-top:16px; min-height:1.5em; font-size:11px; letter-spacing:.28em; text-transform:uppercase}
+  .su-status.ok{color:var(--ink)}
+  .su-status.err{color:#c98a8a}
+
   /* ---- footer ---- */
   footer{
     border-top:1px solid var(--line);
-    padding:26px 0 34px;
+    padding:clamp(34px,6vh,60px) 0 34px;
+    display:flex; flex-direction:column; gap:36px; align-items:stretch;
+  }
+  .foot-bar{
     display:flex; align-items:center; justify-content:space-between;
     gap:16px; flex-wrap:wrap;
     font-size:12px; letter-spacing:.08em; color:var(--dim);
@@ -105,8 +140,10 @@
     .ward{width:min(72vw,300px)}
     .logo-img{width:min(78vw,340px)}
     h1{letter-spacing:.1em}
-    footer{flex-direction:column; text-align:center}
+    .foot-bar{flex-direction:column; text-align:center}
     footer .left{text-align:center}
+    .fields{flex-direction:column; align-items:stretch}
+    .fields button{width:100%}
   }
 
   /* ---- gentle reveal, motion-safe ---- */
@@ -205,17 +242,109 @@
   </section>
 
   <footer>
-    <div class="left">
-      Swiss Made · ©2026–<span id="y">2026</span> Talysm&trade; —
-      Redefining “Zero-Trust Security &amp; Architecture for the AI &amp; Post-Quantum Age” — Open Source
+    <div class="signup">
+      <div class="kicker">Launch notification</div>
+      <form id="su-form" novalidate>
+        <div class="fields">
+          <span>
+            <label for="su-name">Full name</label>
+            <input id="su-name" name="name" type="text" autocomplete="name"
+              placeholder="Your name" maxlength="100" required>
+          </span>
+          <span>
+            <label for="su-email">Email</label>
+            <input id="su-email" name="email" type="email" autocomplete="email"
+              placeholder="you@example.com" maxlength="254" required>
+          </span>
+          <span class="hp" aria-hidden="true">
+            <label for="su-hp">Company</label>
+            <input id="su-hp" name="hp" type="text" tabindex="-1" autocomplete="off">
+          </span>
+          <button type="submit" id="su-btn">Notify me</button>
+        </div>
+        <p class="disc">Not a newsletter — a single, one-time launch notification by
+        email. You can opt in to news later on the final website.</p>
+        <p class="su-status" id="su-status" role="status" aria-live="polite"></p>
+      </form>
     </div>
-    <a class="gh" href="https://github.com/talysm-org" aria-label="Talysm on GitHub" rel="noopener">
-      <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.7.5.6 5.6.6 12c0 5.1 3.3 9.4 7.8 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.8-1.5-3.8-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.4-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.8-5.8 7.8-10.9C23.4 5.6 18.3.5 12 .5z"/></svg>
-    </a>
+    <div class="foot-bar">
+      <div class="left">
+        Swiss Made · ©2026–<span id="y">2026</span> Talysm&trade; —
+        Redefining “Zero-Trust Security &amp; Architecture for the AI &amp; Post-Quantum Age” — Open Source
+      </div>
+      <a class="gh" href="https://github.com/talysm-org" aria-label="Talysm on GitHub" rel="noopener">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 .5C5.7.5.6 5.6.6 12c0 5.1 3.3 9.4 7.8 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.8-1.5-3.8-1.5-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.4-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.2 1.2a11 11 0 0 1 5.8 0c2.2-1.5 3.2-1.2 3.2-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.8-5.8 7.8-10.9C23.4 5.6 18.3.5 12 .5z"/></svg>
+      </a>
+    </div>
   </footer>
 
 </main>
 
-<script>document.getElementById('y').textContent = new Date().getFullYear();</script>
+<script>
+document.getElementById('y').textContent = new Date().getFullYear();
+
+const SU_PUB = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAubC8j3PAsrNYhdABjGUi+Mf9saZh8r1Pc46PCn2Oa3q7dWks7uCi0Z6D42Lg6mGtNADZ4V7952C5jqfzfpAuWo2N3jfBMoGyi0N1G2BExOPAFH2WB6Ybqex23zjq4tX1o7M3xtEzgr+VnGsxgLKlRfnnS37uEQS0z0lXuUj6tErSt8dL5gveLLBZ1Xh3moP8iBHpUjvbkGGhqUZ98bKtYGr46CBMJMdpRdMu6N+IPW5BBuJMH75wb+u2DRoCpZ3en77WUQ4rB3HSVnvKtH0i82Y2hjoHp+9uNVTNchi6cL9I4FMITefXMEONL0wbMETH6TyJ0i9EVc576nA6zyD7KQ4eLYbyB2AkwxsifzNlHRLUDhH6BDqXVvQP/E6IKTfpnpSDLfS0OLmjcvxpzk5Vs897TY0KTVgPau8clJSeDlKjJJSb8gMs8RdHtHpy6x6laUZAymYmgQyOP2ZYzm3OhCpdshZmKn9fVUbQ4Jv2TewaNu4s/Z9lhgMbPANiVrCWewz3/rTWB7Q9cy6vawToSXU2NdpxKbdI4mZm2800rgpTSLaEabFDNtk3Cg/YCF0rCj1c7e+yDGgc8V+PUsAxqAPB3vBMcNw3Ikw6f1/B/RgOflVfEJOPQx5fG/b3o2BWHXChxyhMhp5xGZBFNYeys31brqWRlp3hjUgEL+I4wRcCAwEAAQ==";
+const SU_PAT = atob("UEgx") + atob("UEgy");
+const SU_API = "https://api.github.com/repos/talysm-org/launch/actions/workflows/";
+const SU_HDRS = {
+  "Authorization": "Bearer " + SU_PAT,
+  "Accept": "application/vnd.github+json",
+  "X-GitHub-Api-Version": "2022-11-28",
+  "Content-Type": "application/json"
+};
+
+function suB64(buf){
+  let s = "";
+  new Uint8Array(buf).forEach(b => s += String.fromCharCode(b));
+  return btoa(s);
+}
+
+async function suEncrypt(obj){
+  const der = Uint8Array.from(atob(SU_PUB), c => c.charCodeAt(0));
+  const key = await crypto.subtle.importKey("spki", der, {name:"RSA-OAEP", hash:"SHA-256"}, false, ["encrypt"]);
+  return suB64(await crypto.subtle.encrypt({name:"RSA-OAEP"}, key, new TextEncoder().encode(JSON.stringify(obj))));
+}
+
+function suHash(str){
+  let h = 5381;
+  for (let i = 0; i < str.length; i++) h = ((h * 33) ^ str.charCodeAt(i)) >>> 0;
+  return h.toString(16);
+}
+
+document.getElementById('su-form').addEventListener('submit', async function(ev){
+  ev.preventDefault();
+  const status = document.getElementById('su-status');
+  const btn = document.getElementById('su-btn');
+  const name = document.getElementById('su-name').value.trim();
+  const email = document.getElementById('su-email').value.trim();
+  const hp = document.getElementById('su-hp').value;
+  function say(msg, ok){
+    status.className = "su-status " + (ok ? "ok" : "err");
+    status.textContent = msg;
+  }
+  if (!name || name.length > 100) return say("Please enter your name.", false);
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) return say("Please enter a valid email.", false);
+  btn.disabled = true;
+  say("Sending…", true);
+  try {
+    const p = await suEncrypt({
+      name: name, email: email.toLowerCase(),
+      ts: new Date().toISOString(),
+      uah: suHash(navigator.userAgent), hp: hp
+    });
+    const r = await fetch(SU_API + "signup-ingest.yml/dispatches", {
+      method: "POST", headers: SU_HDRS,
+      body: JSON.stringify({ref: "main", inputs: {p: p}})
+    });
+    if (r.status !== 204) throw 0;
+    document.getElementById('su-name').value = "";
+    document.getElementById('su-email').value = "";
+    say("Thank you — check your inbox to confirm.", true);
+  } catch(e){
+    say("Something went wrong — please try again.", false);
+  }
+  btn.disabled = false;
+});
+</script>
 </body>
 </html>
