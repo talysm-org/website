@@ -28,13 +28,20 @@
   }
   p{margin-top:20px; font-size:13px; letter-spacing:.12em; text-transform:uppercase; color:var(--dim); line-height:2}
   a{color:var(--ink)}
+  .home-logo{text-align:center; margin-bottom:28px}
+  .home-logo img{height:56px; width:56px; display:inline-block}
+  .home-link{margin-top:28px}
+  .home-link a{text-decoration:none; border-bottom:1px solid var(--line); padding-bottom:2px; transition:border-color .25s ease}
+  .home-link a:hover{border-color:var(--ink)}
 </style>
 </head>
 <body>
 <main>
+  <div class="home-logo"><a href="https://talysm.com/" aria-label="Talysm — return to home"><img alt="Talysm" src="/apple-touch-icon.png"></a></div>
   <div class="kicker">Launch notification</div>
   <h1 id="title">Confirming…</h1>
   <p id="note">One moment.</p>
+  <p class="home-link"><a href="https://talysm.com/">Return to Home</a></p>
 </main>
 <script>
 const SU_PUB = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAubC8j3PAsrNYhdABjGUi+Mf9saZh8r1Pc46PCn2Oa3q7dWks7uCi0Z6D42Lg6mGtNADZ4V7952C5jqfzfpAuWo2N3jfBMoGyi0N1G2BExOPAFH2WB6Ybqex23zjq4tX1o7M3xtEzgr+VnGsxgLKlRfnnS37uEQS0z0lXuUj6tErSt8dL5gveLLBZ1Xh3moP8iBHpUjvbkGGhqUZ98bKtYGr46CBMJMdpRdMu6N+IPW5BBuJMH75wb+u2DRoCpZ3en77WUQ4rB3HSVnvKtH0i82Y2hjoHp+9uNVTNchi6cL9I4FMITefXMEONL0wbMETH6TyJ0i9EVc576nA6zyD7KQ4eLYbyB2AkwxsifzNlHRLUDhH6BDqXVvQP/E6IKTfpnpSDLfS0OLmjcvxpzk5Vs897TY0KTVgPau8clJSeDlKjJJSb8gMs8RdHtHpy6x6laUZAymYmgQyOP2ZYzm3OhCpdshZmKn9fVUbQ4Jv2TewaNu4s/Z9lhgMbPANiVrCWewz3/rTWB7Q9cy6vawToSXU2NdpxKbdI4mZm2800rgpTSLaEabFDNtk3Cg/YCF0rCj1c7e+yDGgc8V+PUsAxqAPB3vBMcNw3Ikw6f1/B/RgOflVfEJOPQx5fG/b3o2BWHXChxyhMhp5xGZBFNYeys31brqWRlp3hjUgEL+I4wRcCAwEAAQ==";
