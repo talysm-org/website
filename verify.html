@@ -6,6 +6,11 @@
 <title>Talysm — Confirm your launch notification</title>
 <meta name="robots" content="noindex">
 <meta name="theme-color" content="#000000">
+<link rel="icon" href="/favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
 <style>
   :root{--bg:#000; --ink:#f4f4f2; --dim:#9a9a96; --line:#26262a}
   *{box-sizing:border-box;margin:0;padding:0}
@@ -32,6 +37,7 @@
   <p id="note">One moment.</p>
 </main>
 <script>
+const SU_PUB = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAubC8j3PAsrNYhdABjGUi+Mf9saZh8r1Pc46PCn2Oa3q7dWks7uCi0Z6D42Lg6mGtNADZ4V7952C5jqfzfpAuWo2N3jfBMoGyi0N1G2BExOPAFH2WB6Ybqex23zjq4tX1o7M3xtEzgr+VnGsxgLKlRfnnS37uEQS0z0lXuUj6tErSt8dL5gveLLBZ1Xh3moP8iBHpUjvbkGGhqUZ98bKtYGr46CBMJMdpRdMu6N+IPW5BBuJMH75wb+u2DRoCpZ3en77WUQ4rB3HSVnvKtH0i82Y2hjoHp+9uNVTNchi6cL9I4FMITefXMEONL0wbMETH6TyJ0i9EVc576nA6zyD7KQ4eLYbyB2AkwxsifzNlHRLUDhH6BDqXVvQP/E6IKTfpnpSDLfS0OLmjcvxpzk5Vs897TY0KTVgPau8clJSeDlKjJJSb8gMs8RdHtHpy6x6laUZAymYmgQyOP2ZYzm3OhCpdshZmKn9fVUbQ4Jv2TewaNu4s/Z9lhgMbPANiVrCWewz3/rTWB7Q9cy6vawToSXU2NdpxKbdI4mZm2800rgpTSLaEabFDNtk3Cg/YCF0rCj1c7e+yDGgc8V+PUsAxqAPB3vBMcNw3Ikw6f1/B/RgOflVfEJOPQx5fG/b3o2BWHXChxyhMhp5xGZBFNYeys31brqWRlp3hjUgEL+I4wRcCAwEAAQ==";
 const SU_PAT = atob("UEgx") + atob("UEgy");
 const SU_API = "https://api.github.com/repos/talysm-org/launch/actions/workflows/";
 const SU_HDRS = {
@@ -40,6 +46,18 @@ const SU_HDRS = {
   "X-GitHub-Api-Version": "2022-11-28",
   "Content-Type": "application/json"
 };
+
+function suB64(buf){
+  let s = "";
+  new Uint8Array(buf).forEach(b => s += String.fromCharCode(b));
+  return btoa(s);
+}
+
+async function suEncrypt(obj){
+  const der = Uint8Array.from(atob(SU_PUB), c => c.charCodeAt(0));
+  const key = await crypto.subtle.importKey("spki", der, {name:"RSA-OAEP", hash:"SHA-256"}, false, ["encrypt"]);
+  return suB64(await crypto.subtle.encrypt({name:"RSA-OAEP"}, key, new TextEncoder().encode(JSON.stringify(obj))));
+}
 const title = document.getElementById('title');
 const note = document.getElementById('note');
 const t = new URLSearchParams(location.search).get('t') || '';
@@ -67,9 +85,10 @@ async function poll(nonce, attempts){
   }
   const nonce = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
   try {
+    const p = await suEncrypt({t: t});
     const r = await fetch(SU_API + "signup-verify.yml/dispatches", {
       method: "POST", headers: SU_HDRS,
-      body: JSON.stringify({ref: "main", inputs: {t: t, n: nonce}})
+      body: JSON.stringify({ref: "main", inputs: {p: p, n: nonce}})
     });
     if (r.status !== 204) throw 0;
   } catch(e){
