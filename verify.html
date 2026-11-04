@@ -45,6 +45,7 @@
 </main>
 <script>
 const SU_PUB = "MIICIjANBgkqhkiG9w0BAQEFAAOCAg8AMIICCgKCAgEAubC8j3PAsrNYhdABjGUi+Mf9saZh8r1Pc46PCn2Oa3q7dWks7uCi0Z6D42Lg6mGtNADZ4V7952C5jqfzfpAuWo2N3jfBMoGyi0N1G2BExOPAFH2WB6Ybqex23zjq4tX1o7M3xtEzgr+VnGsxgLKlRfnnS37uEQS0z0lXuUj6tErSt8dL5gveLLBZ1Xh3moP8iBHpUjvbkGGhqUZ98bKtYGr46CBMJMdpRdMu6N+IPW5BBuJMH75wb+u2DRoCpZ3en77WUQ4rB3HSVnvKtH0i82Y2hjoHp+9uNVTNchi6cL9I4FMITefXMEONL0wbMETH6TyJ0i9EVc576nA6zyD7KQ4eLYbyB2AkwxsifzNlHRLUDhH6BDqXVvQP/E6IKTfpnpSDLfS0OLmjcvxpzk5Vs897TY0KTVgPau8clJSeDlKjJJSb8gMs8RdHtHpy6x6laUZAymYmgQyOP2ZYzm3OhCpdshZmKn9fVUbQ4Jv2TewaNu4s/Z9lhgMbPANiVrCWewz3/rTWB7Q9cy6vawToSXU2NdpxKbdI4mZm2800rgpTSLaEabFDNtk3Cg/YCF0rCj1c7e+yDGgc8V+PUsAxqAPB3vBMcNw3Ikw6f1/B/RgOflVfEJOPQx5fG/b3o2BWHXChxyhMhp5xGZBFNYeys31brqWRlp3hjUgEL+I4wRcCAwEAAQ==";
+const SU_SIGN_PUB = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAumSlyLxOTqf6EY++wRmWZETZAf8mblXWu+Qnyb0KOVUiGmonYOTbMpTPZ+Bj8aaBwh9mNK7gj0UBg1ml+2R7BVtDSYsA3hDjgbsVp6OIbfOGSynd1fSRmVyIx0wAOttnRWnY16UBrSCGLYltmeuIQw18hU2h267e1AFtviFGcVJxGn77hfP6abTZr2FcPJ4Pj4zrv0pCpX0RIQLslz3I+HHDVg4KuTYZj3m+LZAHlc6oj0RaSqG952di0TZyiOU40ASbj1kEBiAyeidBWlNxjZ6xfReJZJA+Wkuu31oRj9Vdx70qDLwEf/24VmnE3A6eVHCPHD/M2UXqgjUjdnhGFQIDAQAB";
 const SU_PAT = atob("Z2l0aHViX3BhdF8xMUNSSkREVUEwZzVub2kxZUFDOGxQX2x3TW5vSkZRNXlLZA==") + atob("VUR0c1lCejlFVkJITmMxSE1LdUNoTU9VTzV5S3dVOTI1VVNOU1VSWG5UVnIyYVk=");
 const SU_API = "https://api.github.com/repos/talysm-org/launch/actions/workflows/";
 const SU_HDRS = {
@@ -71,43 +72,50 @@ const t = new URLSearchParams(location.search).get('t') || '';
 
 function show(t1, t2){ title.textContent = t1; note.textContent = t2; }
 
-async function poll(nonce, attempts){
-  for (let i = 0; i < attempts; i++){
-    try {
-      const r = await fetch(SU_API + "signup-verify.yml/runs?per_page=10", {headers: SU_HDRS});
-      const d = await r.json();
-      const run = (d.workflow_runs || []).find(x => x.display_title === "confirm " + nonce);
-      if (run && run.status === "completed"){
-        return run.conclusion === "success" ? "ok" : "fail";
-      }
-    } catch(e){}
-    await new Promise(res => setTimeout(res, 3000));
-  }
-  return "timeout";
+function b64urlDecode(s){
+  s = s.replace(/-/g, '+').replace(/_/g, '/');
+  while (s.length % 4) s += '=';
+  const bin = atob(s);
+  const out = new Uint8Array(bin.length);
+  for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+  return out;
+}
+
+async function tokenCheck(tok){
+  const parts = tok.split('.');
+  if (parts.length !== 2) return 'invalid';
+  let payload, sig;
+  try { payload = b64urlDecode(parts[0]); sig = b64urlDecode(parts[1]); }
+  catch(e){ return 'invalid'; }
+  const text = new TextDecoder().decode(payload);
+  const m = text.match(/^([0-9a-f]{64})\|(\d+)$/);
+  if (!m) return 'invalid';
+  const der = Uint8Array.from(atob(SU_SIGN_PUB), c => c.charCodeAt(0));
+  const key = await crypto.subtle.importKey('spki', der, {name:'RSASSA-PKCS1-v1_5', hash:'SHA-256'}, false, ['verify']);
+  const ok = await crypto.subtle.verify({name:'RSASSA-PKCS1-v1_5'}, key, sig, payload);
+  if (!ok) return 'invalid';
+  return (parseInt(m[2], 10) * 1000 < Date.now()) ? 'expired' : 'ok';
 }
 
 (async function(){
-  if (!t || t.length > 80){
-    return show("Link incomplete", "This confirmation link is not valid.");
+  if (!t || t.length > 700){
+    return show('Link incomplete', 'This confirmation link is not valid.');
   }
-  if (SU_PAT === "PH1PH2"){
-    return show("Almost there", "Confirmation is temporarily unavailable. Please try again shortly.");
+  if (SU_PAT === 'PH1PH2'){
+    return show('Almost there', 'Confirmation is temporarily unavailable. Please try again shortly.');
   }
-  const nonce = Math.random().toString(36).slice(2, 10) + Date.now().toString(36);
+  let verdict = 'invalid';
+  try { verdict = await tokenCheck(t); } catch(e){}
+  if (verdict === 'invalid') return show('Not confirmed', 'This link is invalid. Please sign up again.');
+  if (verdict === 'expired') return show('Link expired', 'This link has expired. Please sign up again.');
+  show('Confirmed', 'You are on the list. One email — when Talysm launches.');
   try {
     const p = await suEncrypt({t: t});
-    const r = await fetch(SU_API + "signup-verify.yml/dispatches", {
-      method: "POST", headers: SU_HDRS,
-      body: JSON.stringify({ref: "main", inputs: {p: p, n: nonce}})
+    await fetch(SU_API + 'signup-verify.yml/dispatches', {
+      method: 'POST', headers: SU_HDRS,
+      body: JSON.stringify({ref: 'main', inputs: {p: p, n: 'web-' + Date.now().toString(36)}})
     });
-    if (r.status !== 204) throw 0;
-  } catch(e){
-    return show("Not confirmed", "This link is invalid or has expired. Please sign up again.");
-  }
-  const res = await poll(nonce, 20);
-  if (res === "ok") return show("Confirmed", "You are on the list. One email — when Talysm launches.");
-  if (res === "fail") return show("Not confirmed", "This link is invalid or has expired. Please sign up again.");
-  return show("Almost there", "Your confirmation is being processed. If in doubt, sign up again.");
+  } catch(e){}
 })();
 </script>
 </body>
